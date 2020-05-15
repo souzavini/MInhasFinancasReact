@@ -2,28 +2,45 @@ import React from 'react'
 import Card from '../components/card'
 import FormGroup from '../components/form-group'
 
+import { withRouter } from 'react-router-dom'
 
+import axios from 'axios'
 
 class Login extends React.Component {
 
     state = {
         email: '',
-        senha: ''
+        senha: '',
+        mensagemErro: null
     }
 
     entrar = () => {
-            console.log('Email: ',this.state.email)
-            console.log('Senha: ',this.state.senha)
+          axios
+          .post('http://localhost:8080/api/usuarios/autenticar', {
+              email: this.state.email,
+              senha:this.state.senha
+          }).then( response => {
+             this.props.history.push('/home')
+          }).catch(erro => {
+              this.setState({mensagemErro: erro.response.data } )
+          })
+    }
+
+    prepareCadastrar = () => {
+        this.props.history.push( '/cadastro-usuarios' )
     }
 
 
     render() {
         return (
-            <div className="container">
+            
                 <div className="row">
                     <div className="col-md-6" style={{ position: 'relative', left: '300px' }}>
                         <div className="bs-docs-section">
                             <Card title="Login">
+                                <div className="row"> 
+                                    <span>{this.state.mensagemErro}</span>
+                                </div>
                                 <div className="row">
                                     <div className="col-lg-12">
                                         <div className="bs-component">
@@ -46,7 +63,7 @@ class Login extends React.Component {
                                                     placeholder="Password"/>
                                                 </FormGroup>
                                                 <button onClick={this.entrar} className="btn btn-success">Entrar</button>
-                                                <button className="btn btn-danger">Cadastrar</button>
+                                                <button onClick={this.prepareCadastrar} className="btn btn-danger">Cadastrar</button>
                                             </fieldset>
                                         </div>
                                     </div>
@@ -57,10 +74,10 @@ class Login extends React.Component {
                     </div>
 
                 </div>
-            </div>
+            
         )
 
     }
 }
 
-export default Login
+export default withRouter ( Login ) 
